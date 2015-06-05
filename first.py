@@ -2,6 +2,11 @@
 
 
 
+import subprocess
+from time import sleep
+
+
+
 """
 Написать сценарий, эмулирующий командную строку Cisco IOS в рамках 
 конфигурирования основных сетевых параметров операционной системы. Реализовать 
@@ -25,17 +30,46 @@ prefix с маской mask через шлюз ip-address
 """
 
 
-show_ip_route = "show ip route"
-show_interfaces = "show interfaces"
+show_ip_route = "sir"#"show ip route"
+show_interfaces = "si"#"show interfaces"
+"""
 show interface {ethernet | loopback} number
 ip route prefix mask ip-address
 no ip route prefix mask ip-address
 interface {ethernet | loopback} number
+"""
 
+string = None
+while string != "shutdown" and string != "exit" and string != "off":
+	string = input("router> ")
 
-
-string = input("router> ")
-print(x)
-
-if string == show_ip_route:
+	if string == show_ip_route:
+		subprocess.call("netstat -rn", shell=True)
+		#subprocess.Popen("ip route")
+	elif string == show_interfaces:
+		subprocess.call("ifconfig", shell=True)
+		#subprocess.Popen("ifconfig")
+	#elif string == :
+		
+	#sleep(0.01)
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
