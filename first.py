@@ -30,6 +30,10 @@ req_help = "help"
 history = "h"
 ip_routing = "ip routing"
 no_ip_routing = "no ip routing"
+router_cur = "router> "
+router_lo_cur = "router#loopback> "
+router_eth_cur = "router#ethernet> "
+
 
 """
 show interface {ethernet | loopback} number
@@ -47,14 +51,14 @@ ipRoutingMode = False
 
 
 
-while string != "shutdown" and string != "exit" and string != "off":
+while string != "exit" and string != "off" and string != "quit":
 	#if i == len_history:
 		#i = 0;
 	if flag == False:
 		print("command ", string, " not found", sep="")
 		flag = True
 	
-	string = input("router> ")
+	string = input(router_cur)
 	#key = ord(getch())
 	#if key == 
 	#history[i] = string
@@ -62,9 +66,6 @@ while string != "shutdown" and string != "exit" and string != "off":
 	if string == show_ip_route:
 		subprocess.call("netstat -rn", shell=True)
 		#subprocess.Popen("ip route")
-	elif string == show_interfaces:
-		subprocess.call("ifconfig", shell=True)
-		#subprocess.Popen("ifconfig")
 	elif string == ip_routing:
 		if ipRoutingMode == True:
 			print("ip routing mode is already on\n", sep="")
@@ -79,16 +80,42 @@ while string != "shutdown" and string != "exit" and string != "off":
 			ipRoutingMode = False
 	elif string == req_help:
 		print(str_help)
+	elif string == '':
+		pass
+	
+	
+	
+	
+	
+		parse_string = string.split(" ")
+	elif string == show_interfaces:
+		subprocess.call("ifconfig -a", shell=True)
+		#subprocess.Popen("ifconfig")
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
 	#elif string == history:
 		#for j in history:
 			#print(history[j],"\n", sep="")
-	elif string == '':
-		pass
+	
 	else:
 		flag = False
 	#++i
 	#sleep(0.01)
-	
 	
 	
 	
