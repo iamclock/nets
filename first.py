@@ -24,8 +24,6 @@ import subprocess
 """
 str_help = "	show ip route - вывод таблицы маршрутизации\n	show interfaces - вывод информации обо всех сетевых интерфейсах\n	show interface {ethernet | loopback} number - вывод информации о заданном интерфейсе\n	ip route prefix mask ip-address - добавление статического маршрута к сети prefix с маской mask через шлюз ip-address\n	no ip route prefix mask ip-address - удаление статического маршрута\n	interface {ethernet | loopback} number - выбор интерфейса для конфигурирования\n		ip address ip-address mask - задание IP-адреса и сетевой маски для выбранного интерфейса\n		no ip address ip-address mask - удаление IP-адреса и сетевой маски для выбранного интерфейса\n		shutdown - отключение интерфейса\n		no shutdown - включение интерфейса\n	ip name-server server-address1 [server-address2] - задание DNS-сервера\n	no ip name-server server-address1 [server-address2] - удаление DNS-сервера\n	ip routing - включение режима маршрутизации\n	no ip routing - отключение режима маршрутизации\n"
 
-show_ip_route = "sir"#"show ip route"
-show_interfaces = "si"#"show interfaces"
 req_help = "help"
 history = "h"
 ip_routing = "ip routing"
@@ -50,6 +48,34 @@ flag = True
 ipRoutingMode = False
 
 
+'''
+def ethernet:
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+def loopback:
+	
+	
+	
+	
+	
+	
+	
+	
+	
+'''
+
+
+
 
 while string != "exit" and string != "off" and string != "quit":
 	#if i == len_history:
@@ -63,10 +89,9 @@ while string != "exit" and string != "off" and string != "quit":
 	#if key == 
 	#history[i] = string
 
-	if string == show_ip_route:
-		subprocess.call("netstat -rn", shell=True)
+		
 		#subprocess.Popen("ip route")
-	elif string == ip_routing:
+	if string == ip_routing:
 		if ipRoutingMode == True:
 			print("ip routing mode is already on\n", sep="")
 		else:
@@ -82,22 +107,18 @@ while string != "exit" and string != "off" and string != "quit":
 		print(str_help)
 	elif string == '':
 		pass
-	
-	
-	
-	
-	
+	else:
 		parse_string = string.split(" ")
-	elif string == show_interfaces:
-		subprocess.call("ifconfig -a", shell=True)
-		#subprocess.Popen("ifconfig")
-		
-		
-		
-		
-		
-		
-		
+	if parse_string[0] == "show":
+		if parse_string[1] == "interfaces":
+			if len(parse_string) > 2:
+				if parse_string[2] == "ethernet":
+				elif parse_tring[2] == "loopback":
+			else:
+				subprocess.call("ifconfig -a", shell=True)
+				#subprocess.Popen("ifconfig")
+		elif parse_string[1] == "ip":
+			subprocess.call("netstat -rn", shell=True)
 		
 		
 		
