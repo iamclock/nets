@@ -107,11 +107,10 @@ while string != "exit" and string != "off" and string != "quit":
 	else:
 		parsed_string = string.split(" ")
 		index = 0
-		pig_in_a_poke = 0
 		if parsed_string[index] == "show":
 			index += 1
 			if len(parsed_string) > 1:
-				if parsed_string[index] == "interfaces":
+				if parsed_string[index] == "interfaces" or parsed_string[index] == "interface":
 					index += 1
 					if len(parsed_string) > 2:
 						if parsed_string[index] == "ethernet":
@@ -131,10 +130,28 @@ while string != "exit" and string != "off" and string != "quit":
 		if index < len(parsed_string):
 			print("command ", parsed_string[index], " not found", sep="")
 		
-		if parsed_string[index] == "interface":
+		elif parsed_string[index] == "interface":
 			index += 1
 			if len(parsed_string) > 1:
-			
+				if parsed_string[index] == "ethernet":
+					index += 1
+					if len(parsed_string) > 2:
+						if parsed_string[index] == "ethernet":
+							index += 1
+							subprocess.call("ifconfig eth0", shell=True)
+						elif parsed_string[index] == "loopback":
+							index += 1
+							subprocess.call("ifconfig lo", shell=True)
+					else:
+						subprocess.call("ifconfig -a", shell=True)
+						#subprocess.Popen("ifconfig")
+				elif parsed_string[index] == "ip":
+					index += 1
+					subprocess.call("netstat -rn", shell=True)
+			else:
+				print("command \"show\" must use with arguments. Type help for more information")
+		if index < len(parsed_string):
+			print("command ", parsed_string[index], " not found", sep="")
 			
 		for item in parsed_string:
 			parsed_string.remove(item)
