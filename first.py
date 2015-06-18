@@ -57,7 +57,7 @@ def ethernet(numb):
 
 
 
-def loopback(numb):
+def loopback():
 	
 	
 	
@@ -126,17 +126,17 @@ while string != "exit" and string != "off" and string != "quit":
 			index += 1
 			if length_parstr > 1:
 				index += 1
-				if parsed_string[index-1] != "ethernet" and parsed_string[index-1] != "loopback":
-					print("command ", parsed_string[index-1], " not found", sep="")
-				elif length_parstr > 2:
-					if parsed_string[index] < '9' and parsed_string[index] > '0':
-						index += 1
-						if parsed_string[index-2] == "ethernet":
+				if parsed_string[index-1] == "ethernet":
+					if length_parstr > 2:
+						if parsed_string[index] < '9' and parsed_string[index] > '0':
+							index += 1
 							ethernet(int(parsed_string[index-1]))
 						else:
-							loopback(int(parsed_string[index-1]))
-					else:
-						print("Third argument must be a number\n")
+							print("Third argument must be a number\n")
+				elif parsed_string[index-1] == "loopback":
+					loopback()
+				else:
+					print("command ", parsed_string[index-1], " not found", sep="")
 			else:
 				print("command \"interface\" must use with arguments. Type help for more information")
 		if index < length_parstr:
