@@ -41,17 +41,15 @@ interface {ethernet | loopback} number
 #history = []
 #i = 0
 string = None
-flag = True
 ipRoutingMode = False
 
 
-'''
-def ethernet:
+def ethernet(numb):
 	
 	
 	
-	string = input("router#ethernet> ")
-	
+	#string = input("router#ethernet> ")
+	print("router#ethernet> \n"+"router> ")
 	
 	
 	
@@ -59,17 +57,16 @@ def ethernet:
 
 
 
-def loopback:
+def loopback(numb):
+	
+	
+	
+	print("router#loopback> \n"+"router> ")
+	#string = input("router#loopback> ")
 	
 	
 	
 	
-	string = input("router#loopback> ")
-	
-	
-	
-	
-'''
 
 
 
@@ -77,9 +74,6 @@ def loopback:
 while string != "exit" and string != "off" and string != "quit":
 	#if i == len_history:
 		#i = 0;
-	if flag == False:
-		print("command ", string, " not found", sep="")
-		flag = True
 	
 	string = input("router> ")
 	#key = ord(getch())
@@ -88,7 +82,9 @@ while string != "exit" and string != "off" and string != "quit":
 
 		
 		#subprocess.Popen("ip route")
-	if string == ip_routing:
+	if string == '' or string == 'off' or string == "quit" or string == "exit":
+		pass
+	elif string == ip_routing:
 		if ipRoutingMode == True:
 			print("ip routing mode is already on", sep="")
 		else:
@@ -102,17 +98,16 @@ while string != "exit" and string != "off" and string != "quit":
 			ipRoutingMode = False
 	elif string == req_help:
 		print(str_help)
-	elif string == '' or string == 'off' or string == "quit" or string == "exit":
-		pass
 	else:
 		parsed_string = string.split(" ")
+		length_parstr = len(parsed_string)
 		index = 0
 		if parsed_string[index] == "show":
 			index += 1
-			if len(parsed_string) > 1:
+			if length_parstr > 1:
 				if parsed_string[index] == "interfaces" or parsed_string[index] == "interface":
 					index += 1
-					if len(parsed_string) > 2:
+					if length_parstr > 2:
 						if parsed_string[index] == "ethernet":
 							index += 1
 							subprocess.call("ifconfig eth0", shell=True)
@@ -127,30 +122,24 @@ while string != "exit" and string != "off" and string != "quit":
 					subprocess.call("netstat -rn", shell=True)
 			else:
 				print("command \"show\" must use with arguments. Type help for more information")
-		if index < len(parsed_string):
-			print("command ", parsed_string[index], " not found", sep="")
-		
 		elif parsed_string[index] == "interface":
 			index += 1
-			if len(parsed_string) > 1:
-				if parsed_string[index] == "ethernet":
-					index += 1
-					if len(parsed_string) > 2:
-						if parsed_string[index] == "ethernet":
+			if length_parstr > 1:
+				index += 1
+				if parsed_string[index-1] == "ethernet":
+					if length_parstr > 2:
+						if parsed_string[index] < '9' and parsed_string[index] > '0':
 							index += 1
-							subprocess.call("ifconfig eth0", shell=True)
-						elif parsed_string[index] == "loopback":
-							index += 1
-							subprocess.call("ifconfig lo", shell=True)
-					else:
-						subprocess.call("ifconfig -a", shell=True)
-						#subprocess.Popen("ifconfig")
-				elif parsed_string[index] == "ip":
-					index += 1
-					subprocess.call("netstat -rn", shell=True)
+							ethernet(int(parsed_string[index-1]))
+						else:
+							print("Third argument must be a number\n")
+				elif parsed_string[index-1] == "loopback":
+					loopback(int(parsed_string[index-1]))
+				else:
+					print("command ", parsed_string[index-1], " not found", sep="")
 			else:
-				print("command \"show\" must use with arguments. Type help for more information")
-		if index < len(parsed_string):
+				print("command \"interface\" must use with arguments. Type help for more information")
+		if index < length_parstr:
 			print("command ", parsed_string[index], " not found", sep="")
 			
 		for item in parsed_string:
