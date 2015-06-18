@@ -134,7 +134,7 @@ while string != "exit" and string != "off" and string != "quit":
 						else:
 							print("Third argument must be a number\n")
 				elif parsed_string[index-1] == "loopback":
-					loopback(int(parsed_string[index-1]))
+					loopback()
 				else:
 					print("command ", parsed_string[index-1], " not found", sep="")
 			else:
