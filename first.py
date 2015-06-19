@@ -119,9 +119,16 @@ while string != "exit" and string != "off" and string != "quit":
 						#subprocess.Popen("ifconfig")
 				elif parsed_string[index] == "ip":
 					index += 1
-					subprocess.call("netstat -rn", shell=True)
+					if length_parstr > 2:
+						index += 1
+						if parsed_string[index-1] == "route":
+							subprocess.call("netstat -rn", shell=True)
+						else:
+							print("command ", parsed_string[index-1], " not found", sep="")
+					else:
+						print("too few arguments for \"show\" command. Type help for more information.")
 			else:
-				print("command \"show\" must use with arguments. Type help for more information")
+				print("command \"show\" must use with arguments. Type help for more information.")
 		elif parsed_string[index] == "interface":
 			index += 1
 			if length_parstr > 1:
@@ -141,7 +148,6 @@ while string != "exit" and string != "off" and string != "quit":
 				print("command \"interface\" must use with arguments. Type help for more information")
 		if index < length_parstr:
 			print("command ", parsed_string[index], " not found", sep="")
-			
 		for item in parsed_string:
 			parsed_string.remove(item)
 		
