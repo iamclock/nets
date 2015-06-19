@@ -49,10 +49,10 @@ def ethernet(numb):
 	
 	
 	#string = input("router#ethernet> ")
-	print("router#ethernet> \n"+"router> ")
+	print("router#ethernet> "+str(numb))
 	
 	
-	
+	return
 
 
 
@@ -61,12 +61,12 @@ def loopback():
 	
 	
 	
-	print("router#loopback> \n"+"router> ")
+	print("router#loopback> "+str(numb))
 	#string = input("router#loopback> ")
 	
 	
 	
-	
+	return
 
 
 
@@ -84,13 +84,13 @@ while string != "exit" and string != "off" and string != "quit":
 		#subprocess.Popen("ip route")
 	if string == '' or string == 'off' or string == "quit" or string == "exit":
 		pass
-	elif string == ip_routing:
+	elif string == ip_routing: # ip routing - включение режима маршрутизации
 		if ipRoutingMode == True:
 			print("ip routing mode is already on", sep="")
 		else:
 			print("ip routing mode is on", sep="")
 			ipRoutingMode = True
-	elif string == no_ip_routing:
+	elif string == no_ip_routing: # no ip routing - отключение режима маршрутизации
 		if ipRoutingMode == False:
 			print("ip routing mode is already off", sep="")
 		else:
@@ -102,7 +102,7 @@ while string != "exit" and string != "off" and string != "quit":
 		parsed_string = string.split(" ")
 		length_parstr = len(parsed_string)
 		index = 0
-		if parsed_string[index] == "show":
+		if parsed_string[index] == "show": # show ip route; show interfaces; show interface {ethernet | loopback} number
 			index += 1
 			if length_parstr > 1:
 				if parsed_string[index] == "interfaces" or parsed_string[index] == "interface":
@@ -129,27 +129,30 @@ while string != "exit" and string != "off" and string != "quit":
 						print("too few arguments for \"show\" command. Type help for more information.")
 			else:
 				print("command \"show\" must use with arguments. Type help for more information.")
-		elif parsed_string[index] == "interface":
+		elif parsed_string[index] == "interface": #interface {ethernet | loopback} number
 			index += 1
 			if length_parstr > 1:
 				index += 1
-				if parsed_string[index-1] == "ethernet":
+				if parsed_string[index-1] == "ethernet" or parsed_string[index-1] == "loopback":
 					if length_parstr > 2:
-						if parsed_string[index] < '9' and parsed_string[index] > '0':
-							index += 1
-							ethernet(int(parsed_string[index-1]))
+						try:
+							numb = int(parsed_string[index])
+						except ValueError:
+							print("Third argument expected to be a number")
 						else:
-							print("Third argument must be a number\n")
-				elif parsed_string[index-1] == "loopback":
-					loopback()
+							index += 1
+							if parsed_string[index-2] == "ethernet":
+								ethernet(int(parsed_string[index-1]))
+							if parsed_string[index-2] == "loopback":
+								loopback(int(parsed_string[index-1]))
 				else:
-					print("command ", parsed_string[index-1], " not found", sep="")
+					print("Command ", parsed_string[index-1], " not found", sep="")
 			else:
-				print("command \"interface\" must use with arguments. Type help for more information")
+				print("Command \"interface\" must use with arguments. Type help for more information")
 		if index < length_parstr:
-			print("command ", parsed_string[index], " not found", sep="")
-		for item in parsed_string:
-			parsed_string.remove(item)
+			print("Command ", parsed_string[index], " not found", sep="")
+		#for item in parsed_string:
+		#	parsed_string.remove(item)
 		
 		
 		
