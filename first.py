@@ -24,10 +24,85 @@ import subprocess
 """
 str_help = "	show ip route - вывод таблицы маршрутизации\n	show interfaces - вывод информации обо всех сетевых интерфейсах\n	show interface {ethernet | loopback} number - вывод информации о заданном интерфейсе\n	ip route prefix mask ip-address - добавление статического маршрута к сети prefix с маской mask через шлюз ip-address\n	no ip route prefix mask ip-address - удаление статического маршрута\n	interface {ethernet | loopback} number - выбор интерфейса для конфигурирования\n		ip address ip-address mask - задание IP-адреса и сетевой маски для выбранного интерфейса\n		no ip address ip-address mask - удаление IP-адреса и сетевой маски для выбранного интерфейса\n		shutdown - отключение интерфейса\n		no shutdown - включение интерфейса\n	ip name-server server-address1 [server-address2] - задание DNS-сервера\n	no ip name-server server-address1 [server-address2] - удаление DNS-сервера\n	ip routing - включение режима маршрутизации\n	no ip routing - отключение режима маршрутизации\n"
 
-req_help = "help"
-history = "history"
-ip_routing = "ip routing"
-no_ip_routing = "no ip routing"
+
+def dict_conc(obj_dict):
+	conc = ''
+	for element in obj_dict:
+		conc += element
+	return conc
+	
+
+
+def interface(interface, number):
+	#check = subprocess.Popen("ifconfig -a".split(" "), stdout=subprocess.PIPE)
+	#check = subprocess.Popen(["awk", "{print $1}"], stdout=subprocess.PIPE, stdin=check.stdout)
+	#check = subprocess.Popen("grep eth".split(" "), stdout=subprocess.PIPE, stdin=check.stdout)
+	#string = check.stdout.read(),decode("utf-8")
+	#print(string)
+	
+	
+	
+	
+	check = subprocess.Popen(("ifconfig "+interface+str(number)).split(" "), stdout=subprocess.PIPE)
+	
+	check = check.stdout.read().decode("utf-8")
+	
+	if len(check) == 0:
+		return
+	
+	
+	while True:
+		string = input("router#"+interface+"> ")
+		if string == '' or string == "quit" or string == "done":
+			if string == "quit" or string == "done":
+				break
+			pass
+		if string == "shutdown":
+			subprocess.call("sudo ifconfig "+interface+str(number)+" down", shell=True)
+		if string == "no shutdown":
+			subprocess.call("sudo ifconfig "+interface+str(number)+" up", shell=True)
+		parsed_string = string.split(" ")
+		length_parstr = len(parsed_string)
+		index = 0
+		if parsed_string[index] == "ip":
+			index += 1
+			if length_parstr > 1 and parsed_string[index] == "address":
+				index += 1
+				if length_parstr > 2:
+					ip_adr = parsed_string[index].split('.')
+					index += 1
+					if len(ip_adr) == 4:
+						ip_adr = dict_conc(ip_adr)
+						try:
+							ip_adr = int(ip_adr)
+						except ValueError:
+							print("Incorrect IP address")
+						else:
+							if length_parstr > 3:
+								mask = parsed_string[index].split('.')
+								index += 1
+								if len(mask) == 4:
+									mask = dict_conc(mask)
+									try:
+										mask = int(mask)
+									except ValueError:
+										print("Incorrect mask")
+									else:
+										subprocess.call("ifconfig "+interface+str(number)+" "+parsed_string[index-2]+" netmask "+parsed_string[index-1]+" up", shell=True)
+								else:
+									print("Incorrect mask")
+					else:
+						print("Incorrect IP address")
+						
+							
+		elif parsed_string[index] == "no":
+			
+		else:
+			
+	return
+
+
+
 
 
 """
@@ -37,6 +112,13 @@ no ip route prefix mask ip-address
 interface {ethernet | loopback} number
 """
 
+
+req_help = "help"
+history = "history"
+ip_routing = "ip routing"
+no_ip_routing = "no ip routing"
+
+
 #len_history = 256
 #history = []
 #i = 0
@@ -44,34 +126,7 @@ string = None
 ipRoutingMode = False
 
 
-def ethernet(numb):
-	
-	
-	
-	#string = input("router#ethernet> ")
-	print("router#ethernet> "+str(numb))
-	
-	
-	return
-
-
-
-
-def loopback():
-	
-	
-	
-	print("router#loopback> "+str(numb))
-	#string = input("router#loopback> ")
-	
-	
-	
-	return
-
-
-
-
-while string != "exit" and string != "off" and string != "quit":
+while True:#string != "exit" and string != "off" and string != "quit":
 	#if i == len_history:
 		#i = 0;
 	
@@ -83,6 +138,8 @@ while string != "exit" and string != "off" and string != "quit":
 		
 		#subprocess.Popen("ip route")
 	if string == '' or string == 'off' or string == "quit" or string == "exit":
+		if string == 'off' or string == "quit" or string == "exit":
+			break
 		pass
 	elif string == ip_routing: # ip routing - включение режима маршрутизации
 		if ipRoutingMode == True:
@@ -110,7 +167,7 @@ while string != "exit" and string != "off" and string != "quit":
 					if length_parstr > 2:
 						if parsed_string[index] == "ethernet":
 							index += 1
-							subprocess.call("ifconfig eth0", shell=True)
+							subprocess.call("ifconfig eth", shell=True)
 						elif parsed_string[index] == "loopback":
 							index += 1
 							subprocess.call("ifconfig lo", shell=True)
@@ -142,9 +199,11 @@ while string != "exit" and string != "off" and string != "quit":
 						else:
 							index += 1
 							if parsed_string[index-2] == "ethernet":
-								ethernet(int(parsed_string[index-1]))
+								interface("eth", int(parsed_string[index-1]))
 							if parsed_string[index-2] == "loopback":
-								loopback(int(parsed_string[index-1]))
+								interface("lo", int(parsed_string[index-1]))
+					else:
+						print("Too few arguments for this command")
 				else:
 					print("Command ", parsed_string[index-1], " not found", sep="")
 			else:
@@ -173,19 +232,18 @@ while string != "exit" and string != "off" and string != "quit":
 		#print(parsed_string[3])
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
