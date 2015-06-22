@@ -50,6 +50,10 @@ def interface(interface, number):
 	if len(check) == 0:
 		return
 	
+	if interface == "loopback":
+		inter = "lo"
+	else:
+		inter = "eth"
 	
 	while True:
 		string = input("router#"+interface+"> ")
@@ -58,9 +62,9 @@ def interface(interface, number):
 				break
 			pass
 		if string == "shutdown":
-			subprocess.call("sudo ifconfig "+interface+str(number)+" down", shell=True)
+			subprocess.call("sudo ifconfig "+inter+str(number)+" down", shell=True)
 		if string == "no shutdown":
-			subprocess.call("sudo ifconfig "+interface+str(number)+" up", shell=True)
+			subprocess.call("sudo ifconfig "+inter+str(number)+" up", shell=True)
 		parsed_string = string.split(" ")
 		length_parstr = len(parsed_string)
 		index = 0
@@ -88,7 +92,7 @@ def interface(interface, number):
 									except ValueError:
 										print("Incorrect mask")
 									else:
-										subprocess.call("ifconfig "+interface+str(number)+" "+parsed_string[index-2]+" netmask "+parsed_string[index-1]+" up", shell=True)
+										subprocess.call("ifconfig "+intere+str(number)+" "+parsed_string[index-2]+" netmask "+parsed_string[index-1]+" up", shell=True)
 								else:
 									print("Incorrect mask")
 					else:
@@ -218,18 +222,19 @@ while True:#string != "exit" and string != "off" and string != "quit":
 		
 		
 		
+	'''
+	elif string == history:
+		for j in history:
+			print(history[j],"\n", sep="")
 	
-	#elif string == history:
-		#for j in history:
-			#print(history[j],"\n", sep="")
+	else:
+		flag = False
+	++i
+	sleep(0.01)
 	
-	#else:
-		#flag = False
-	#++i
-	#sleep(0.01)
-	
-	#if len(parsed_string) > 3:
-		#print(parsed_string[3])
+	if len(parsed_string) > 3:
+		print(parsed_string[3])
+	'''
 	
 	
 
