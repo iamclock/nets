@@ -118,6 +118,8 @@ def interface(interface, number):
 									print("Incorrect mask")
 					else:
 						print("Incorrect IP address")
+		if index < length_parstr:
+			print("Command "+parsed_string[index]+" not found")
 	return
 
 
