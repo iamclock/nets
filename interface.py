@@ -13,6 +13,30 @@ def dict_conc(obj_dict):
 	return conc
 
 
+def mask_wizard(mask):
+	numer = 0
+	for i in len(mask):
+		if mask[i] == "128":
+			numer += 1
+		elif mask[i] == "192":
+			numer += 2
+		elif mask[i] == "224":
+			numer += 3
+		elif mask[i] == "240":
+			numer += 4
+		elif mask[i] == "248":
+			numer += 5
+		elif mask[i] == "252":
+			numer += 6
+		elif mask[i] == "254":
+			numer += 7
+		elif mask[i] == "255":
+			numer += 8
+		else:
+			return -1
+
+
+
 
 def interface(interface, number):
 	#check = subprocess.Popen("ifconfig -a".split(" "), stdout=subprocess.PIPE)
@@ -51,15 +75,15 @@ def interface(interface, number):
 		if parsed_string[index] == "no":
 			index += 1
 			if length_parstr == 1:
-				fail = 1
+				#fail = 1
 				print("Command \"no\" must use with arguments. Type help for more information.")
-		if parsed_string[index] == "ip" and fail == 0:
+		if parsed_string[index] == "ip":
 			index += 1
 			if length_parstr > 1 and parsed_string[index] == "address":
 				index += 1
-				if length_parstr > 2 and parsed_string[index] == "add" or "del":
+				if length_parstr > 2:
 					ip_adr = parsed_string[index].split('.')
-					index += 1
+					#index += 1
 					if len(ip_adr) == 4:
 						for i in len(ip_addr):
 							try:
@@ -68,9 +92,10 @@ def interface(interface, number):
 								fail = 1
 								print("Incorrect IP address")
 						if fail == 0:
+							index += 1
 							if length_parstr > 3:
 								mask = parsed_string[index].split('.')
-								index += 1
+								#index += 1
 								if len(mask) == 4:
 									#mask = dict_conc(mask)
 									for i in len(mask):
@@ -80,23 +105,28 @@ def interface(interface, number):
 											fail = 1
 											print("Incorrect mask")
 									if fail == 0:
-										subprocess.call("ifconfig "+intere+str(number)+" "+parsed_string[index-2]+" netmask "+parsed_string[index-1]+" up", shell=True)
+										numb_mask = mask_wizard(mask)
+										if numb != -1:
+											index += 1
+											if index == 4:
+												subprocess.call("ip addr add "+parsed_string[index-2]+"/"+str(numb_mask)+"dev "+inter+str(number), shell=True)
+											else:
+												subprocess.call("ip addr del "+parsed_string[index-2]+"/"+str(numb_mask)+"dev "+inter+str(number), shell=True)
+										else:
+											print("Incorrect mask")
 								else:
 									print("Incorrect mask")
 					else:
 						print("Incorrect IP address")
-						
-							
-		elif parsed_string[index] == "no":
-			#WORK_IN_PROGRESS
-			print("Work in progress")
-		#else:
-			
 	return
 
 
-
-interface("loopback", 0)
+while True:
+	string = input("Choose interface(ethernet/loopback) and numba: ")
+	if string == "off":
+		break
+	parsedString = string.split(" ")
+	interface(parsedString[0], int(parsedString[1]))
 
 
 
