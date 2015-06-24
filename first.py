@@ -81,12 +81,13 @@ def interface(interface, number):
 					ip_adr = parsed_string[index].split('.')
 					index += 1
 					if len(ip_adr) == 4:
-						ip_adr = dict_conc(ip_adr)
-						try:
-							ip_adr = int(ip_adr)
-						except ValueError:
-							print("Incorrect IP address")
-						else:
+						for i in len(ip_addr):
+							try:
+								check_ip_adr = int(ip_adr[i])
+							except ValueError:
+								fail = 1
+								print("Incorrect IP address")
+						if fail == 0:
 							if length_parstr > 3:
 								mask = parsed_string[index].split('.')
 								index += 1
