@@ -30,7 +30,7 @@ def dict_conc(obj_dict):
 	for element in obj_dict:
 		conc += element
 	return conc
-	
+
 
 
 def interface(interface, number):
@@ -42,7 +42,7 @@ def interface(interface, number):
 	
 	
 	
-	
+	# Здесь может быть глюк
 	check = subprocess.Popen(("ifconfig "+interface+str(number)).split(" "), stdout=subprocess.PIPE)
 	
 	check = check.stdout.read().decode("utf-8")
@@ -68,11 +68,16 @@ def interface(interface, number):
 		parsed_string = string.split(" ")
 		length_parstr = len(parsed_string)
 		index = 0
-		if parsed_string[index] == "ip":
+		if parsed_string[index] == "no":
+			index += 1
+			if length_parstr == 1:
+				fail = 1
+				print("Command \"no\" must use with arguments. Type help for more information.")
+		if parsed_string[index] == "ip" and fail == 0:
 			index += 1
 			if length_parstr > 1 and parsed_string[index] == "address":
 				index += 1
-				if length_parstr > 2:
+				if length_parstr > 2 and parsed_string[index] == "add" or "del":
 					ip_adr = parsed_string[index].split('.')
 					index += 1
 					if len(ip_adr) == 4:
@@ -86,12 +91,14 @@ def interface(interface, number):
 								mask = parsed_string[index].split('.')
 								index += 1
 								if len(mask) == 4:
-									mask = dict_conc(mask)
-									try:
-										mask = int(mask)
-									except ValueError:
-										print("Incorrect mask")
-									else:
+									#mask = dict_conc(mask)
+									for i in len(mask):
+										try:
+											check_mask = int(mask[i])
+										except ValueError:
+											fail = 1
+											print("Incorrect mask")
+									if fail == 0:
 										subprocess.call("ifconfig "+intere+str(number)+" "+parsed_string[index-2]+" netmask "+parsed_string[index-1]+" up", shell=True)
 								else:
 									print("Incorrect mask")
@@ -100,8 +107,9 @@ def interface(interface, number):
 						
 							
 		elif parsed_string[index] == "no":
-			
-		else:
+			#WORK_IN_PROGRESS
+			print("Work in progress")
+		#else:
 			
 	return
 
@@ -133,7 +141,7 @@ ipRoutingMode = False
 while True:#string != "exit" and string != "off" and string != "quit":
 	#if i == len_history:
 		#i = 0;
-	
+	fail = 0
 	string = input("router> ")
 	#key = ord(getch())
 	#if key == 
@@ -164,32 +172,82 @@ while True:#string != "exit" and string != "off" and string != "quit":
 		length_parstr = len(parsed_string)
 		index = 0
 		if parsed_string[index] == "show": # show ip route; show interfaces; show interface {ethernet | loopback} number
-			index += 1
-			if length_parstr > 1:
-				if parsed_string[index] == "interfaces" or parsed_string[index] == "interface":
-					index += 1
-					if length_parstr > 2:
-						if parsed_string[index] == "ethernet":
-							index += 1
-							subprocess.call("ifconfig eth", shell=True)
-						elif parsed_string[index] == "loopback":
-							index += 1
-							subprocess.call("ifconfig lo", shell=True)
-					else:
-						subprocess.call("ifconfig -a", shell=True)
-						#subprocess.Popen("ifconfig")
-				elif parsed_string[index] == "ip":
-					index += 1
-					if length_parstr > 2:
-						index += 1
-						if parsed_string[index-1] == "route":
-							subprocess.call("netstat -rn", shell=True)
-						else:
-							print("command ", parsed_string[index-1], " not found", sep="")
-					else:
-						print("too few arguments for \"show\" command. Type help for more information.")
+			if length_parstr == 1:
+				fail = 1
+				print("Command \"show\" must use with arguments. Type help for more information.")
 			else:
-				print("command \"show\" must use with arguments. Type help for more information.")
+				index += 1
+		if parsed_string[index] == "interfaces" or parsed_string[index] == "interface": #interface {ethernet | loopback} number
+			if index == 0 and parsed_string[index] == "interfaces":
+				pass
+			else:
+				index += 1
+				if parsed_string[index-1] == "interface":
+					if parsed_string[index] == "ethernet" or parsed_string[index] == "loopback":
+						index += 1
+						few = 1
+						if index <= length_parstr:
+							if index == 3:
+								if length_parstr > 3:
+									few = 0
+									try:
+										int(parsed_string[index])
+									except ValueError:
+										print("Incorrect argument. Must be a number")
+									else:
+										inter = "lo"
+										if parsed_string[index-1] == "ethernet":
+											inter = "eth"
+										subprocess.call("ifconfig "+inter+parsed_string[index], shell=True)
+										index += 1
+							else:
+								if index < length_parstr:
+									few = 0
+									try:
+										numb = int(parsed_string[index])
+									except ValueError:
+										print("Third argument expected to be a number")
+									else:
+										index += 1
+										if parsed_string[index-2] == "ethernet":
+											interface("eth", int(parsed_string[index-1]))
+										if parsed_string[index-2] == "loopback":
+											interface("lo", int(parsed_string[index-1]))
+						if few == 1:
+							print("Too few arguments for this command")
+					else:
+						print("Command ", parsed_string[index-1], " not found", sep="")
+				elif parsed_string[index-1] == "interfaces":
+					if index == length_parstr:
+						subprocess.call("ifconfig -a", shell=True)
+					else:
+						print("Unknown command \""+parsed_string[index]+"\" for \"interfaces\"")
+						index += 1
+				else:
+					print("Command \"interface\" must use with arguments. Type help for more information")
+		elif parsed_string[index] == "no" and index == 0:
+			index += 1
+		elif parsed_string[index] == "ip":
+			index += 1
+			if length_parstr > 2:
+				index += 1
+				if parsed_string[index-1] == "route":
+					if parsed_string[0] == "show":
+						subprocess.call("netstat -rn", shell=True)
+					else:
+						if parsed_string[0] == "no":
+							#WORK_IN_PROGRESS
+							print("work in progress. Expected to be \"no ip route prefix mask ip-address - добавление статического маршрута\" condition")
+						else:
+							#WORK_IN_PROGRESS
+							print("work in progress. Expected to be \"ip route prefix mask ip-address - добавление статического маршрута\" condition")
+				else:
+					print("Command ", parsed_string[index-1], " not found", sep="")
+			else:
+				print("Too few arguments for \"show\" command. Type help for more information.")
+		
+				
+		'''
 		elif parsed_string[index] == "interface": #interface {ethernet | loopback} number
 			index += 1
 			if length_parstr > 1:
@@ -212,6 +270,7 @@ while True:#string != "exit" and string != "off" and string != "quit":
 					print("Command ", parsed_string[index-1], " not found", sep="")
 			else:
 				print("Command \"interface\" must use with arguments. Type help for more information")
+		'''
 		if index < length_parstr:
 			print("Command ", parsed_string[index], " not found", sep="")
 		#for item in parsed_string:
@@ -235,7 +294,6 @@ while True:#string != "exit" and string != "off" and string != "quit":
 	if len(parsed_string) > 3:
 		print(parsed_string[3])
 	'''
-	
 	
 
 
