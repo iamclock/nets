@@ -247,30 +247,6 @@ while True:#string != "exit" and string != "off" and string != "quit":
 				print("Too few arguments for \"show\" command. Type help for more information.")
 		
 				
-		'''
-		elif parsed_string[index] == "interface": #interface {ethernet | loopback} number
-			index += 1
-			if length_parstr > 1:
-				index += 1
-				if parsed_string[index-1] == "ethernet" or parsed_string[index-1] == "loopback":
-					if length_parstr > 2:
-						try:
-							numb = int(parsed_string[index])
-						except ValueError:
-							print("Third argument expected to be a number")
-						else:
-							index += 1
-							if parsed_string[index-2] == "ethernet":
-								interface("eth", int(parsed_string[index-1]))
-							if parsed_string[index-2] == "loopback":
-								interface("lo", int(parsed_string[index-1]))
-					else:
-						print("Too few arguments for this command")
-				else:
-					print("Command ", parsed_string[index-1], " not found", sep="")
-			else:
-				print("Command \"interface\" must use with arguments. Type help for more information")
-		'''
 		if index < length_parstr:
 			print("Command ", parsed_string[index], " not found", sep="")
 		#for item in parsed_string:
