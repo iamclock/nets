@@ -226,28 +226,41 @@ while True:#string != "exit" and string != "off" and string != "quit":
 						index += 1
 				else:
 					print("Command \"interface\" must use with arguments. Type help for more information")
-		elif parsed_string[index] == "no" and index == 0:
+		if parsed_string[index] == "no" and index == 0:
+			if length_parstr == 1:
+				print("Too few arguments for this command. Type help for more information")
+			else:
+				index += 1
+		if parsed_string[index] == "ip":
 			index += 1
-		elif parsed_string[index] == "ip":
-			index += 1
-			if length_parstr > 2:
+			if index < length_parstr:
 				index += 1
 				if parsed_string[index-1] == "route":
 					if parsed_string[0] == "show":
 						subprocess.call("netstat -rn", shell=True)
-					else:
-						if parsed_string[0] == "no":
-							#WORK_IN_PROGRESS
-							print("work in progress. Expected to be \"no ip route prefix mask ip-address - добавление статического маршрута\" condition")
-						else:
-							#WORK_IN_PROGRESS
-							print("work in progress. Expected to be \"ip route prefix mask ip-address - добавление статического маршрута\" condition")
+					elif parsed_string[0] == "no":
+						#WORK_IN_PROGRESS
+						print("work in progress. Expected to be \"no ip route prefix mask ip-address - добавление статического маршрута\" condition")
+						
+						
+						
+						
+					elif index == 2:
+						#WORK_IN_PROGRESS
+						print("work in progress. Expected to be \"ip route prefix mask ip-address - добавление статического маршрута\" condition")
+				elif condition:
+					#ip name-server server-address1 [server-address2] - задание DNS-сервера
+					#no ip name-server server-address1 [server-address2] - удаление DNS-сервера
+				elif parsed_string[index-1] == "routing":
+					#WORK_IN_PROGRESS
+					
 				else:
 					print("Command ", parsed_string[index-1], " not found", sep="")
 			else:
-				print("Too few arguments for \"show\" command. Type help for more information.")
-		
-				
+				if parsed_string[0] == "show":
+					print("Too few arguments for \"show\" command. Type help for more information.")
+				elif parsed_string[0] == "no":
+					print("Too few arguments for this command. Type help for more information.")
 		if index < length_parstr:
 			print("Command ", parsed_string[index], " not found", sep="")
 		#for item in parsed_string:
