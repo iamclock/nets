@@ -8,7 +8,8 @@
 
 using std::cout;
 using std::cin;
-
+using std::getline;
+using std::string;
 
 
 // https://stackoverflow.com/questions/15712821/c-error-undefined-reference-to-classfunction раздельная компиляция
@@ -20,46 +21,85 @@ public:
 	mppp(const char *ip_new, unsigned short int port = 0, int type = 2);
 	void client();
 	void server();
-	void setip(char *buffer);
-	void setport(char *buffer);
+	void setip(string buffer);
+	void setport(string buffer);
 	void verify(); //проверка клиента сервером, что протокол совпадает
 private:
 	int ERROR();
 	bool secondary;
 	int sockit;
 	struct sockaddr_in addr;
-	unsigned short int check_port(char *buffer); // переводит из строки в номер с проверкой на пригодность
+	unsigned short int check_port(string buffer); // переводит из строки в номер с проверкой на пригодность
 	char ip[42];
 	unsigned short int port;
-	char buffer[2048];
+	string buffer;
 };
 
 
 void mppp::client(){
-	
-	if(connect(sockit, (struct sockaddr *)& addr, sizeof(addr)) < 0){
-		//ERROR
-		cout << "not Connected\n";
+	char buffer_new[2048];
+	while(1){
+		if(getline(cin, buffer) == nullptr) break;
+		int len_buffer = buffer.length();
+		if(2047 < len_buffer) len_buffer = 2048;
+		for(int i=0; i < len_buffer; ++i) buffer_new[i] = buffer[i];
+		sendto(sockit, buffer_new, len_buffer, 0, (struct sockaddr *)&addr, sizeof(addr));
+		int n = recvfrom(sockit, buffer_new, 2047, 0, nullptr, nullptr);
+		buffer_new[n] = '\0';
+		fputs(buffer_new, stdout);
 	}
-	cout << "Connected\n";
 }
 
 
 void mppp::server(){
-	struct sockaddr_in client_addr;
+	struct sockaddr_in client_addr[1];
 	if(bind(sockit, (struct sockaddr *)& addr, sizeof(addr)) < 0){
 		//ERROR
 		cout << "not Binded\n";
 	}
-	cout << "Binded\n";
-	listen(sockit, 3); // второй аргумент показывает максимальное число очереди для клиентов, которые будут ожидать соединения  с сервером по этому сокету
-	int client_socket = accept(sockit, (struct sockaddr *)&client_addr, (socklen_t*)(sizeof(struct sockaddr_in))); //доделать
-	if(client_socket < 0){
-		//ERROR
-		cout << "not Connected\n";
+	else cout << "Binded\n";
+	char buffer_new[2048];
+	
+	while(1){
+		socklen_t len = sizeof(client_addr);
+		int n = recvfrom(sockit, buffer_new, 2047, 0, (sockaddr *)client_addr, &len);
+		sendto(sockit, buffer_new, n, 0, (sockaddr *)client_addr, sizeof(client_addr));
+		buffer_new[n] = '\0';
 	}
-	cout << "Connected\n";
 }
+
+
+
+
+unsigned short int mppp::check_port(string buffer){
+	// добавить обработку шестнадцатеричных и восьмеричных чисел
+	int number = 0;
+	int len_buffer = buffer.length(); //чем метод size отличаеца от метода length?
+	if(len_buffer > 5){
+		cout << "Incorrect port\n";
+		return 0;
+	}
+	for(int i=0; i < len_buffer; ++i){
+		if(buffer[i] > 47 && buffer[i] < 58){
+			number *= 10;
+			number += buffer[i] - 48;
+		}
+		else{
+			// Можно оставить без вывода ошибки, а проверять не вернулся ли 0 или сделать ввиде исключения
+			cout << "Error. Port must be a number\n";
+			return 0;
+		}
+	}
+	if(number > 65535){
+		// Можно оставить без вывода ошибки, а проверять не вернулся ли 0 или сделать ввиде исключения
+		cout << "Error. Port must be a number in range 1024 - 65535\n";
+		return 0;
+	}
+	return number;
+}
+
+
+
 
 
 mppp::mppp(const char *ip_new, unsigned short int port_new, int type){
@@ -104,41 +144,10 @@ mppp::mppp(const char *ip_new, unsigned short int port_new, int type){
 
 
 
-unsigned short int check_port(char *buffer){
-	// добавить обработку шестнадцатеричных и восьмеричных чисел
-	int number = 0;
-	int len_buffer = strlen(buffer);
-	if(len_buffer > 5){
-		cout << "Incorrect port\n";
-		return 0;
-	}
-	for(int i=0; i < len_buffer; ++i){
-		if(buffer[i] > 47 && buffer[i] < 58){
-			number *= 10;
-			number += buffer[i] - 48;
-		}
-		else{
-			// Можно оставить без вывода ошибки, а проверять не вернулся ли 0 или сделать ввиде исключения
-			cout << "Error. Port must be a number\n";
-			return 0;
-		}
-	}
-	if(number > 65535){
-		// Можно оставить без вывода ошибки, а проверять не вернулся ли 0 или сделать ввиде исключения
-		cout << "Error. Port must be a number in range 1024 - 65535\n";
-		return 0;
-	}
-	return number;
-}
-
-
-
-
-
-void mppp::setip(char *buffer){
+void mppp::setip(string buffer){
 	//cin >> buffer;
 	//можно добавить обработку ipv6
-	int len_buffer = strlen(buffer);
+	int len_buffer = buffer.length();
 	if(len_buffer > 15 && len_buffer < 42){
 		// Добавить ошибку ввиде исключения
 		cout << "Error. Incorrect IP address\n";
@@ -150,7 +159,7 @@ void mppp::setip(char *buffer){
 
 
 
-void mppp::setport(char *buffer){
+void mppp::setport(string buffer){
 	//cin >> buffer;
 	port = check_port(buffer);
 }

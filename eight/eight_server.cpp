@@ -10,7 +10,7 @@
 
 
 int main(){
-	char myip[16] = "109.171.16.127";
+	char myip[16] = "192.168.203.7";
 	//std::cout << myip << '\n';
 	mppp server(myip, 43690, 0);
 	

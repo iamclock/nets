@@ -34,11 +34,16 @@ unsigned short int check_port(char *buffer){
 
 
 int main(){
-	
+	/*
 	char buffer[42];
 	unsigned short int p;
 	cin >> buffer;
 	p = check_port(buffer);
 	cout << p << '\n';
+	*/
+	std::string buffer;
+	buffer = "65535";
+	std::getline(cin, buffer);
+	cout << buffer.length() << '\n';
 	return 0;
 }
