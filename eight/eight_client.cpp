@@ -16,8 +16,6 @@ int main(int argc, char *argv[]){
 		cout << "ERROR: First argument must be IP address\n";
 		return 0;
 	}
-	
-	
 	mppp client(43690, 1, argv[1]);
 	
 	
