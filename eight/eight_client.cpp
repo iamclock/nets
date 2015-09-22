@@ -17,7 +17,8 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 	
-	mppp client(43690);//, 1, argv[1]);
+	
+	mppp client(43690, 1, argv[1]);
 	
 	
 	return 0;

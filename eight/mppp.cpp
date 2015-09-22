@@ -8,14 +8,14 @@
 #include <cerrno>
 #include <netdb.h>
 #define TIMEOUT_MS 100
-
+#define SERVER 0
+#define CLIENT 1
 
 
 using std::cout;
 using std::cin;
 using std::getline;
 using std::string;
-
 
 // https://stackoverflow.com/questions/15712821/c-error-undefined-reference-to-classfunction раздельная компиляция
 // http://www.cyberforum.ru/post5972945.html
@@ -94,25 +94,27 @@ mppp::mppp(unsigned short int port_new, int type, char *ip_new){
 	addr.sin_port = htons(port);
 	
 	while(type == 2){
-		secondary = false;
-		// Проверить, что будет с type, если ввести не 0 и 1
-		cout << "What type of object do you prefer server[0]/client[1]: ";
-		cin >> type;
-		if(type == 1) secondary = true;
+		type = 0;
+		static char type_new = '0';
+		cout << "What type of object do you prefer server[0]/client[1](default server): ";
+		type_new = cin.get();
+		if(type_new == '1') type = 1;
 		else{
-			if(type == 0 || type == 10) secondary = false;
-			else{
+			if(type_new != '0' && type_new != '\n'){
 				type = 2;
 				cout << "Incorrect value. Try again\n";
+				while( type_new = cin.get() != '\n' );
 			}
 		}
 	}
+	secondary = (bool)type;
 	
 	
 	if(ip_new) setip(ip_new);
 	else if(secondary){
 		cout << "ERROR: IP address required\n";
 		exit(0);
+		// можно добавить предложение о вводе
 	}
 	
 	sockit = socket(AF_INET, SOCK_DGRAM, 0);
@@ -241,7 +243,6 @@ void mppp::setip(char *ip){
 			addr.sin_addr = *(struct in_addr *) host->h_addr_list[0];
 		else{
 			herror("Incorrect address");
-			exit(0);
 		}
 	}
 }
