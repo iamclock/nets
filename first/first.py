@@ -136,12 +136,28 @@ no_ip_routing = "no ip routing"
 
 
 string = None
+
+# Вариант #1
+check = subprocess.Popen("cat /proc/sys/net/ipv4/ip_forward".split(" "),  stdout=subprocess.PIPE)
+check = check.stdout.read().decode("utf-8")
+ipRoutingMode = 2 # сделано здесь для отладки, если cat будет правильно возвращать значение ( 0 или 1) тогда можно убрать, ибо условие ниже будет всегда проходить правильно
+
+if check[0] == '1':
+	ipRoutingMode = True
+elif check[0] == '0':
+	ipRoutingMode = False
+
+
+'''
+Вариант #2
 f1 = open('/proc/sys/net/ipv4/ip_forward')
 ch = f1.read(1)
 if ch == '0':
 	ipRoutingMode = False
 else:
 	ipRoutingMode = True
+'''
+
 
 while True:
 	fail = 0
@@ -283,7 +299,10 @@ while True:
 							if ipRoutingMode == False:
 								print("ip routing mode is already off", sep="")
 							else:
-								subprocess.call("sudo echo \"0\" > /proc/sys/net/ipv4/ip_forward", shell=True)
+								echo = subprocess.Popen("echo \"0\"", stdout=subprocess.PIPE, shell=True)
+								tee = subprocess.Popen("sudo tee /proc/sys/net/ipv4/ip_forward", stdin=echo.stdout, stdout=subprocess.PIPE, shell=True).wait()
+								# команда stdout=subprocess.PIPE используется здесь, для того, чтобы tee не выводила результат на экран, тоесть результаты из потока вывода оседают в объекте tee.
+								# метод wait() используется для того, чтобы скрипт ждал ввода кода администратора и не продолжал работу
 								print("ip routing mode is off", sep="")
 								ipRoutingMode = False
 				elif index == 1:
@@ -355,7 +374,10 @@ while True:
 							if ipRoutingMode == True:
 								print("ip routing mode is already on", sep="")
 							else:
-								subprocess.call("sudo echo \"1\" > /proc/sys/net/ipv4/ip_forward", shell=True)
+								echo = subprocess.Popen("echo \"1\"", stdout=subprocess.PIPE, shell=True)
+								tee = subprocess.Popen("sudo tee /proc/sys/net/ipv4/ip_forward", stdin=echo.stdout, stdout=subprocess.PIPE, shell=True).wait()
+								# команда stdout=subprocess.PIPE используется здесь, для того, чтобы tee не выводила результат на экран, тоесть результаты из потока вывода оседают в объекте tee.
+								# метод wait() используется для того, чтобы скрипт ждал ввода кода администратора и не продолжал работу
 								print("ip routing mode is on", sep="")
 								ipRoutingMode = True
 			else:
